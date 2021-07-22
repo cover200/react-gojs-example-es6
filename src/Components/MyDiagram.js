@@ -1,59 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 import * as go from 'gojs';
 import { ToolManager, Diagram } from 'gojs';
 import { GojsDiagram, ModelChangeEventType } from 'react-gojs';
 import DiagramButtons from './DiagramButtons';
-import './MyDiagram.css';
 import { getRandomColor } from '../Helpers/ColorHelper';
 import SelectionDetails from './SelectionDetails';
 
-class MyDiagram extends React.Component {
-    nodeId = 0;
+import './MyDiagram.css';
 
-    constructor(props) {
-        super(props);
-        this.createDiagram = this.createDiagram.bind(this);
-        this.modelChangeHandler = this.modelChangeHandler.bind(this);
-        this.initModelHandler = this.initModelHandler.bind(this);
-        this.updateColorHandler = this.updateColorHandler.bind(this);
-        this.nodeSelectionHandler = this.nodeSelectionHandler.bind(this);
-        this.removeNode = this.removeNode.bind(this);
-        this.removeLink = this.removeLink.bind(this);
-        this.addNode = this.addNode.bind(this);
-        this.updateNodeText = this.updateNodeText.bind(this);
-        this.onTextEdited = this.onTextEdited.bind(this);
-        this.state = {
-            selectedNodeKeys: [],
-            model: {
-                nodeDataArray: [{ key: 'Alpha', label: 'Alpha', color: 'lightblue' }],
-                linkDataArray: []
-            }
-        };
+const initialState = {
+    selectedNodeKeys: [],
+    model: {
+        nodeDataArray: [{ key: 'Alpha', label: 'Alpha', color: 'lightblue' }],
+        linkDataArray: []
     }
+};
 
-    render() {
-        return [
-            <DiagramButtons
-                key="diagramButtons"
-                onInit={this.initModelHandler}
-                onUpdateColor={this.updateColorHandler}
-                onAddNode={this.addNode}
-            />,
-            <SelectionDetails key="selectionDetails" selectedNodes={this.state.selectedNodeKeys} />,
-            <GojsDiagram
-                key="gojsDiagram"
-                diagramId="myDiagramDiv"
-                model={this.state.model}
-                createDiagram={this.createDiagram}
-                className="myDiagram"
-                onModelChange={this.modelChangeHandler}
-            />
-        ];
-    }
+const MyDiagram = () => {
+    const [state, setState] = useState(initialState);
+    let nodeId = 0;
 
-    initModelHandler() {
-        this.setState({
-            ...this.state,
+    const initModelHandler = () => {
+        setState({
+            ...state,
             model: {
                 nodeDataArray: [
                     { key: 'Alpha', label: 'Alpha', color: 'lightblue' },
@@ -70,26 +39,26 @@ class MyDiagram extends React.Component {
                 ]
             }
         });
-    }
+    };
 
-    updateColorHandler() {
-        const updatedNodes = this.state.model.nodeDataArray.map(node => {
+    const updateColorHandler = () => {
+        const updatedNodes = state.model.nodeDataArray.map(node => {
             return {
                 ...node,
                 color: getRandomColor()
             };
         });
 
-        this.setState({
-            ...this.state,
+        setState({
+            ...state,
             model: {
-                ...this.state.model,
+                ...state.model,
                 nodeDataArray: updatedNodes
             }
         });
-    }
+    };
 
-    createDiagram(diagramId: string) {
+    const createDiagram = diagramId => {
         const $ = go.GraphObject.make;
 
         const myDiagram = $(go.Diagram, diagramId, {
@@ -106,7 +75,7 @@ class MyDiagram extends React.Component {
             allowSelect: true,
             autoScale: Diagram.Uniform,
             contentAlignment: go.Spot.LeftCenter,
-            TextEdited: this.onTextEdited
+            TextEdited: onTextEdited
         });
 
         myDiagram.toolManager.panningTool.isEnabled = false;
@@ -116,140 +85,160 @@ class MyDiagram extends React.Component {
             go.Node,
             'Auto',
             {
-                selectionChanged: node => this.nodeSelectionHandler(node.key, node.isSelected)
+                selectionChanged: node => nodeSelectionHandler(node.key, node.isSelected)
             },
             $(go.Shape, 'RoundedRectangle', { strokeWidth: 0 }, new go.Binding('fill', 'color')),
             $(go.TextBlock, { margin: 8, editable: true }, new go.Binding('text', 'label'))
         );
 
         return myDiagram;
-    }
+    };
 
-    modelChangeHandler(event) {
+    const modelChangeHandler = event => {
         switch (event.eventType) {
             case ModelChangeEventType.Remove:
                 if (event.nodeData) {
-                    this.removeNode(event.nodeData.key);
+                    removeNode(event.nodeData.key);
                 }
                 if (event.linkData) {
-                    this.removeLink(event.linkData);
+                    removeLink(event.linkData);
                 }
                 break;
             default:
                 break;
         }
-    }
+    };
 
-    addNode() {
-        const newNodeId = 'node' + this.nodeId;
-        const linksToAdd = this.state.selectedNodeKeys.map(parent => {
+    const addNode = () => {
+        const newNodeId = 'node' + nodeId;
+        const linksToAdd = state.selectedNodeKeys.map(parent => {
             return { from: parent, to: newNodeId };
         });
-        this.setState({
-            ...this.state,
+        setState({
+            ...state,
             model: {
-                ...this.state.model,
+                ...state.model,
                 nodeDataArray: [
-                    ...this.state.model.nodeDataArray,
+                    ...state.model.nodeDataArray,
                     { key: newNodeId, label: newNodeId, color: getRandomColor() }
                 ],
                 linkDataArray:
                     linksToAdd.length > 0
-                        ? [...this.state.model.linkDataArray].concat(linksToAdd)
-                        : [...this.state.model.linkDataArray]
+                        ? [...state.model.linkDataArray].concat(linksToAdd)
+                        : [...state.model.linkDataArray]
             }
         });
-        this.nodeId += 1;
-    }
+        nodeId += 1;
+    };
 
-    removeNode(nodeKey) {
-        const nodeToRemoveIndex = this.state.model.nodeDataArray.findIndex(node => node.key === nodeKey);
+    const removeNode = nodeKey => {
+        const nodeToRemoveIndex = state.model.nodeDataArray.findIndex(node => node.key === nodeKey);
         if (nodeToRemoveIndex === -1) {
             return;
         }
-        this.setState({
-            ...this.state,
+        setState({
+            ...state,
             model: {
-                ...this.state.model,
+                ...state.model,
                 nodeDataArray: [
-                    ...this.state.model.nodeDataArray.slice(0, nodeToRemoveIndex),
-                    ...this.state.model.nodeDataArray.slice(nodeToRemoveIndex + 1)
+                    ...state.model.nodeDataArray.slice(0, nodeToRemoveIndex),
+                    ...state.model.nodeDataArray.slice(nodeToRemoveIndex + 1)
                 ]
             }
         });
-    }
+    };
 
-    removeLink(linKToRemove) {
-        const linkToRemoveIndex = this.state.model.linkDataArray.findIndex(
+    const removeLink = linKToRemove => {
+        const linkToRemoveIndex = state.model.linkDataArray.findIndex(
             link => link.from === linKToRemove.from && link.to === linKToRemove.to
         );
         if (linkToRemoveIndex === -1) {
             return;
         }
         return {
-            ...this.state,
+            ...state,
             model: {
-                ...this.state.model,
+                ...state.model,
                 linkDataArray: [
-                    ...this.state.model.linkDataArray.slice(0, linkToRemoveIndex),
-                    ...this.state.model.linkDataArray.slice(linkToRemoveIndex + 1)
+                    ...state.model.linkDataArray.slice(0, linkToRemoveIndex),
+                    ...state.model.linkDataArray.slice(linkToRemoveIndex + 1)
                 ]
             }
         };
-    }
+    };
 
-    updateNodeText(nodeKey, text) {
-        const nodeToUpdateIndex = this.state.model.nodeDataArray.findIndex(node => node.key === nodeKey);
+    const updateNodeText = (nodeKey, text) => {
+        const nodeToUpdateIndex = state.model.nodeDataArray.findIndex(node => node.key === nodeKey);
         if (nodeToUpdateIndex === -1) {
             return;
         }
-        this.setState({
-            ...this.state,
+        setState({
+            ...state,
             model: {
-                ...this.state.model,
+                ...state.model,
                 nodeDataArray: [
-                    ...this.state.model.nodeDataArray.slice(0, nodeToUpdateIndex),
+                    ...state.model.nodeDataArray.slice(0, nodeToUpdateIndex),
                     {
-                        ...this.state.model.nodeDataArray[nodeToUpdateIndex],
+                        ...state.model.nodeDataArray[nodeToUpdateIndex],
                         label: text
                     },
-                    ...this.state.model.nodeDataArray.slice(nodeToUpdateIndex + 1)
+                    ...state.model.nodeDataArray.slice(nodeToUpdateIndex + 1)
                 ]
             }
         });
-    }
+    };
 
-    nodeSelectionHandler(nodeKey, isSelected) {
+    const nodeSelectionHandler = (nodeKey, isSelected) => {
         if (isSelected) {
-            this.setState({
-                ...this.state,
-                selectedNodeKeys: [...this.state.selectedNodeKeys, nodeKey]
+            setState({
+                ...state,
+                selectedNodeKeys: [...state.selectedNodeKeys, nodeKey]
             });
         } else {
-            const nodeIndexToRemove = this.state.selectedNodeKeys.findIndex(key => key === nodeKey);
+            const nodeIndexToRemove = state.selectedNodeKeys.findIndex(key => key === nodeKey);
             if (nodeIndexToRemove === -1) {
                 return;
             }
-            this.setState({
-                ...this.state,
+            setState({
+                ...state,
                 selectedNodeKeys: [
-                    ...this.state.selectedNodeKeys.slice(0, nodeIndexToRemove),
-                    ...this.state.selectedNodeKeys.slice(nodeIndexToRemove + 1)
+                    ...state.selectedNodeKeys.slice(0, nodeIndexToRemove),
+                    ...state.selectedNodeKeys.slice(nodeIndexToRemove + 1)
                 ]
             });
         }
-    }
+    };
 
-    onTextEdited(e) {
+    const onTextEdited = e => {
         const tb = e.subject;
+        console.log(tb);
+        console.log(e);
         if (tb === null) {
             return;
         }
         const node = tb.part;
         if (node instanceof go.Node) {
-            this.updateNodeText(node.key, tb.text);
+            updateNodeText(node.key, tb.text);
         }
-    }
-}
+    };
+
+    return [
+        <DiagramButtons
+            key="diagramButtons"
+            onInit={initModelHandler}
+            onUpdateColor={updateColorHandler}
+            onAddNode={addNode}
+        />,
+        <SelectionDetails key="selectionDetails" selectedNodes={state.selectedNodeKeys} />,
+        <GojsDiagram
+            key="gojsDiagram"
+            diagramId="myDiagramDiv"
+            model={state.model}
+            createDiagram={createDiagram}
+            className="myDiagram"
+            onModelChange={modelChangeHandler}
+        />
+    ];
+};
 
 export default MyDiagram;

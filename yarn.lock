@@ -4319,10 +4319,10 @@ globby@^6.1.0:
     pify "^2.0.0"
     pinkie-promise "^2.0.0"
 
-gojs@^2.0.12:
-  version "2.0.12"
-  resolved "https://registry.yarnpkg.com/gojs/-/gojs-2.0.12.tgz#f3cae65a689428e808c1e1d06a79b3001021031f"
-  integrity sha512-4gR5FjWLwc0arFRiko3RJiq78H+H3exlVel2g2Q1C9+9e4JUb0vaqVCGK240gBikFEv1xYD7JXX5cGjaFqwVPw==
+gojs@2.0.18:
+  version "2.0.18"
+  resolved "https://registry.yarnpkg.com/gojs/-/gojs-2.0.18.tgz#160d0e79b727cf70f1039b827a09cc602294dc55"
+  integrity sha512-3IB/HPJvPrbwkQrzMevCkVnzR8wKE0c7CrKCBHlr8CLQKV5m2yy3OiHavpWgkM59jIKCc8Kboi9ETUMgjGfZSA==
 
 graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6:
   version "4.1.15"
@@ -8030,12 +8030,12 @@ react-error-overlay@^5.1.6:
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-5.1.6.tgz#0cd73407c5d141f9638ae1e0c63e7b2bf7e9929d"
   integrity sha512-X1Y+0jR47ImDVr54Ab6V9eGk0Hnu7fVWGeHQSOXHf/C2pF9c6uy3gef8QUeuUiWlNb0i08InPSE5a/KJzNzw1Q==
 
-react-gojs@^4.3.0:
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/react-gojs/-/react-gojs-4.3.0.tgz#b4cefee2c1b26bff586a99b31ba1045d2f9b0d13"
-  integrity sha512-g+t05/npZidpkQYBRs2JJTky8V0R8fjJC/Ru3cE3MwADJM2e9VkT6IdQfpQErtcU/W1rn4O/ppJQSVrJmY2ImA==
+react-gojs@^4.9.0:
+  version "4.9.0"
+  resolved "https://registry.yarnpkg.com/react-gojs/-/react-gojs-4.9.0.tgz#4c44d64fe667a7f42bb807632d50847dcfb31432"
+  integrity sha512-so8iaWOpBKUIVTYV4Y/lAYeJi2ElqkD3J5eLRl0mGk1h9yg5sISpVp5oKEijv6KWt2yjODdDM6AN1vou5zyO+Q==
   dependencies:
-    gojs "^2.0.12"
+    gojs "2.0.18"
 
 react-is@^16.8.1, react-is@^16.8.4:
   version "16.8.6"
